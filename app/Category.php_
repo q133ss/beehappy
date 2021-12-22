@@ -1,0 +1,119 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model as Model;
+
+
+
+/**
+ * Class Category
+ * @package App\Models
+ * @version December 5, 2021, 10:13 am UTC
+ *
+ * @property \Illuminate\Database\Eloquent\Collection $categoryPaths
+ * @property \Illuminate\Database\Eloquent\Collection $products
+ * @property string $name
+ * @property string $img
+ * @property integer $type
+ * @property integer $order
+ * @property string $status
+ * @property string $descr
+ * @property integer $region_id
+ * @property App\Models\Category $parent
+ * @property \Illuminate\Database\Eloquent\Collection $child
+ */
+class Category extends Model
+{
+
+
+    public $table = 'categories';
+
+    const CREATED_AT = 'created_at';
+    const UPDATED_AT = 'updated_at';
+
+    const TYPE_PRODUCTS = 'products';
+    const TYPE_CONSTR_MAIN = 'constr_main';
+    const TYPE_CONSTR_SUB = 'constr_sub';
+    const TYPE_CONSTR_OAZIS = 'constr_oazis';
+    const TYPE_ADDITIONALLY = 'additionallies';
+    const TYPE_URGENTLY = 'urgentlies';
+
+    const TYPES = [
+        self::TYPE_PRODUCTS => 'Букеты',
+        self::TYPE_CONSTR_MAIN => 'Конструктор цветы',
+        self::TYPE_CONSTR_SUB => 'Конструктор упаковка',
+        self::TYPE_CONSTR_OAZIS => 'Конструктор оазис',
+        self::TYPE_ADDITIONALLY => 'Дополнительные товары',
+        self::TYPE_URGENTLY => 'Срочный заказ',
+    ];
+
+
+
+    public $fillable = [
+        'name',
+        'img',
+        'type',
+        'order',
+        'status',
+        'descr',
+        'parent_id'
+    ];
+
+    /**
+     * The attributes that should be casted to native types.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'id' => 'integer',
+        'name' => 'string',
+        'img' => 'string',
+        'type' => 'integer',
+        'order' => 'integer',
+        'status' => 'string',
+        'descr' => 'string',
+        'parent_id' => 'integen'
+    ];
+
+    /**
+     * Validation rules
+     *
+     * @var array
+     */
+    public static $rules = [
+        'name' => 'required|string|max:255',
+        'img' => 'nullable|string|max:255',
+        'type' => 'required|integer',
+        'order' => 'required|integer',
+        'status' => 'required|string|max:255',
+        'descr' => 'required|string',
+        'parent_id'  => 'nullable|integer'
+    ];
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function categoryPaths()
+    {
+        return $this->hasMany(\App\Models\CategoryPath::class, 'category_id');
+    }
+
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     **/
+    public function products()
+    {
+        return $this->hasMany(\App\Models\Product::class, 'category_id');
+    }
+
+    public function parent()
+    {
+        return $this->belongsTo(self::class, 'parent_id');
+    }
+
+    public function child()
+    {
+        return $this->hasMany(self::class, 'parent_id');
+    }
+}
